@@ -46,7 +46,8 @@ class Knowledge(models.Model):
 		self.loadBook()
 		self.loadLevel()
 		for child in self.children:
-			child.loadAll()
+			if child.id != self.id:
+				child.loadAll()
 
 	def loadBook(self):
 		self.book = self.chapter.book
