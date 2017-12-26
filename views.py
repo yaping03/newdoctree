@@ -51,6 +51,7 @@ def docmerge(request):
 					if merge_from.content:
 						merge_from.title = merge_from.title+"_合并"
 						merge_from.parent = parent
+						merge_from.level = parent+1
 						merge_from.save()
 					else:
 						merge_from.delete()
@@ -163,8 +164,8 @@ def near_range(pagination):
 	start = current-half_range
 	if start<1:
 		start = 1
-	end = current+half_range+1
+	end = current+half_range
 	if end>pagination.paginator.num_pages:
 		end = pagination.paginator.num_pages
 
-	return range(start, end)
+	return range(start, end+1)

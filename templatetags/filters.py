@@ -28,11 +28,11 @@ def near_range(pagination):
 	start = current-half_range
 	if start<1:
 		start = 1
-	end = current+half_range+1
+	end = current+half_range
 	if end>pagination.paginator.num_pages:
 		end = pagination.paginator.num_pages
 
-	return range(start, end)
+	return range(start, end+1)
 
 @register.filter(name="none_2_null")
 def none_2_null(str):
