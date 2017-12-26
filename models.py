@@ -55,7 +55,8 @@ class Knowledge(models.Model):
 		children = self.knowledge_set.order_by('title')
 		if passon:
 			for knowledge in children:
-				knowledge.loadChildren()
+				if knowledge.id != self.id:
+					knowledge.loadChildren()
 
 		self.children = children
 
