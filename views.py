@@ -51,7 +51,7 @@ def docmerge(request):
 					if merge_from.content:
 						merge_from.title = merge_from.title+"_合并"
 						merge_from.parent = parent
-						merge_from.level = parent+1
+						merge_from.level = parent.level+1
 						merge_from.save()
 					else:
 						merge_from.delete()
