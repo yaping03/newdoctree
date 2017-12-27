@@ -50,7 +50,13 @@ class Knowledge(models.Model):
 				child.loadAll()
 
 	def loadBook(self):
+		# print(123)
 		self.book = self.chapter.book
+		# print(self.book)
+
+	# def loadParent(self):
+	# 	self.parent = self.parent
+
 
 	def loadChildren(self, passon=False):
 		children = self.knowledge_set.order_by('title')
@@ -87,6 +93,7 @@ class Knowledge(models.Model):
 		children = self.knowledge_set.all()
 		for child in children:
 			child.setLevel(toLevel+1)
+
 	def setStatus(self, status):
 		self.status = status
 		self.save()
