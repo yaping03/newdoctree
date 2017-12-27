@@ -14,7 +14,7 @@ def doctree(request, title):
 	level = 4
 	if title=="None":
 		title = None
-	knowledges = Knowledge.objects.filter(level=level, title=title)[:8]
+	knowledges = Knowledge.objects.filter(level=level, title=title).order_by('id')[:8]
 	# print(knowledges)
 	parents = []
 	children = []
