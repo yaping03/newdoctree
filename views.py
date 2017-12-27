@@ -14,7 +14,7 @@ def doctree(request, title):
 	level = 4
 	if title=="None":
 		title = None
-	knowledges = Knowledge.objects.filter(level=level, title=title).order_by('id')[:8]
+	knowledges = Knowledge.objects.filter(level=level, title=title)[:8]
 	# print(knowledges)
 	parents = []
 	children = []
@@ -135,7 +135,7 @@ def kwlist(request):
 	if request.GET.get('search'):
 		klist = klist.filter(title__contains=request.GET.get('search'))
 
-	klist = klist.order_by('id')
+	klist = klist.order_by('-modified_at')
 	paginator = Paginator(klist, 25) # Show 25 contacts per page
 	page = request.GET.get('page')
 	try:
