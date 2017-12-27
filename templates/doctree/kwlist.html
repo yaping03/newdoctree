@@ -89,7 +89,7 @@
 	<div class="panel-footer">
 		<ul class="pagination">
 			{% if knowledges.has_previous %}
-			<li><a href="?page={{ request|page:knowledges.previous_page_number }}">&laquo;</a></li>
+			<li><a href="{{ request|page:knowledges.previous_page_number }}">&laquo;</a></li>
 			{% endif %}
 		    
 			{% for p in near_range  %}

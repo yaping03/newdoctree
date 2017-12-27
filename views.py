@@ -38,11 +38,13 @@ def docmerge(request):
 	if action=="合并":
 		merge_ids = request.POST.getlist('merge_ids[]')
 		merge_to = request.POST.get('merge_to')
+		merge_to = int(merge_to)
 
 		if merge_ids and merge_to:
 			parent = Knowledge.objects.get(id=merge_to)
 			for merge_id in merge_ids:
-				if merge_id!=merge_to:
+				merge_id = int(merge_id)
+				if merge_id != merge_to:
 					merge_from= Knowledge.objects.get(id=merge_id)
 					merge_from.loadChildren()
 					for child in merge_from.children:
@@ -92,8 +94,10 @@ def kwmerge(request):
 				toLevel = 4
 			elif merge_to<0:
 				toLevel = 4
+
 			for merge_id in merge_ids:
-				if merge_id!=merge_to:
+				merge_id = int(merge_id)
+				if merge_id != merge_to:
 					merge_from= Knowledge.objects.get(id=merge_id)
 					merge_from.parent = parent
 					merge_from.setLevel(toLevel)
