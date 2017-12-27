@@ -138,24 +138,33 @@ def parse(path, json_path):
                 data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_l5][-1][key_l6][-1][key_type] = type_str
         elif form == Md.Content:
             if last_l == 4:
-                data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_content] = line
+                original = data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1].get(key_content, "")
+                if original:
+                    original = original+"\n"
+                    data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_content] = original+line
             elif last_l == 5:
-                data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_l5][-1][key_content] = line
+                original = data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_l5][-1].get(key_content, "")
+                if original:
+                    original = original+"\n"
+                data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_l5][-1][key_content] = original+line
             elif last_l == 6:
-                data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_l5][-1][key_l6][-1][key_content] = line
+                original = data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_l5][-1][key_l6][-1].get(key_content, "")
+                if original:
+                    original = original+"\n"
+                data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_l5][-1][key_l6][-1][key_content] = original+line
         elif form == Md.List:
             if last_l == 4:
                 if key_list not in data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1]:
                     data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_list] = list()
-                data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_list].append(line[2:])
+                data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_list].append(get_list_line(line))
             elif last_l == 5:
                 if key_list not in data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_l5][-1]:
                     data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_l5][-1][key_list] = list()
-                data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_l5][-1][key_list].append(line[2:])
+                data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_l5][-1][key_list].append(get_list_line(line))
             elif last_l == 6:
                 if key_list not in data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_l5][-1][key_l6][-1]:
                     data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_l5][-1][key_l6][-1][key_list] = list()
-                data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_l5][-1][key_l6][-1][key_list].append(line[2:])
+                data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_l5][-1][key_l6][-1][key_list].append(get_list_line(line))
 
     ftool.write_json(data, json_path)
 
@@ -176,6 +185,10 @@ def check_format(text):
             return Md(level)
 
     if text.startswith('- '):
+        return Md.List
+
+    oli = text.split('. ', 1)
+    if oli[0].isdigit():
         return Md.List
 
     key_title = '书名'
@@ -217,6 +230,12 @@ def get_type(text):
         raise Exception('获取类型数据有误')
     return ds[1]
 
+def get_list_line(text):
+    if text.startswith('- '):
+        return text[2:]
+
+    oli = text.split('. ', 1)
+    return oli[1]
 
 @unique
 class Md(Enum):
