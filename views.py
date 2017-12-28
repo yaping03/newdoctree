@@ -154,7 +154,7 @@ def kwlist(request):
 	# print(knowledges.paginator.page_range)
 
 	books = Book.objects.order_by('title','summarized', 'id')
-	status = ["pending", "pass", "reject"]
+	status = ["pending", "pass", "reject", "alone"]
 	r = near_range(knowledges)
 	search = request.GET.get('search')
 
@@ -234,12 +234,6 @@ def rejectlist(request):
 					k=k.parent
 				except Exception as e:
 					k=None
-			# while k.parent:
-			# 	k = k.parent
-			# 	root_id = k.id
-			# 	k.loadBook()
-			# 	result.insert(0, k)
-			# 	exist_ids.append(k.id)
 
 			result.insert(0,root_id)
 			results.append(result)
