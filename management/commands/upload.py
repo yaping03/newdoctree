@@ -9,24 +9,39 @@ class Command(BaseCommand):
 		# print(parser)
 
 	def handle(self, *args, **options):
-		# print(options)
-		# folderPath = os.path.dirname(os.path.dirname(__file__))+"/JSON"
 		folderPath = options['dir'][0]
-		# print(folderPath)
 		files = os.listdir(folderPath)
+		willUpload = True
 		for file in files:
 			if self.isJson(file):
-				uploaded = FileUpload.objects.filter(title=file).values_list('created_at',flat=True)
+				uploaded = FileUpload.objects.filter(title=file).order_by('-book_id','-created_at')[0]
 				if uploaded:
-					message = input("文件：【"+file+"】已在下列时间上传：\n"+str(uploaded)+"\n是否重复上传 (yes/no?)")
-					if message=="yes":
-						filePath = folderPath+"/"+file
-						self.stdout.write("uploading: "+file)
-						uploading = FileUpload(title=file)
-						uploading.save()
-						data = self.loadJSON(filePath)
-						book = self.loadBook(data)
-						level1 = self.loadIndex(data, 1, book, None)
+					try:
+						book = uploaded.book
+					except Exception as e:
+						book = None
+						uploaded.book = None
+						uploaded.save()
+
+					if uploaded and book :
+						message = input("文件：【"+file+"】已在下列时间上传：\n"+str(uploaded.created_at)+"\n是否重复上传 (yes/no?)")
+						if message=="yes":
+							willUpload = True
+						else :
+							willUpload = False
+				
+				if willUpload :
+					uploading = FileUpload(title = file)
+					uploading.book = book
+					uploading.save()
+
+
+
+					filePath = folderPath+"/"+file
+					self.stdout.write("uploading: "+file)
+					data = self.loadJSON(filePath)
+					book = self.loadBook(data, uploading)
+					level1 = self.loadIndex(data, 1, book, None)
 
 	def isJson(self, file):
 		segs = file.split('.')
@@ -37,17 +52,23 @@ class Command(BaseCommand):
 		data = json.loads(json_data)
 		return data
 
-	def loadBook(self, bookDict):
-		bookInfo = bookDict['基本信息']
-		book = Book()
-		try:
-			book.title = bookInfo.get('书名')
-			book.summarized = bookInfo.get('整理者')
-			book.author = bookInfo.get('作者')
-		except:
-			self.stderr.write("ERROR")
+	def loadBook(self, bookDict, upload=None):
+		if upload and upload.book:
+			book = upload.book
+		else :
+			bookInfo = bookDict['基本信息']
+			book = Book()
+			try:
+				book.title = bookInfo.get('书名')
+				book.summarized = bookInfo.get('整理者')
+				book.author = bookInfo.get('作者')
+			except:
+				self.stderr.write("ERROR")
 
-		book.save()
+			book.save()
+			upload.book = book
+			upload.save()
+
 		return book
 		# print(book)
 

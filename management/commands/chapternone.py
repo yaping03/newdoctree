@@ -4,14 +4,12 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 class Command(BaseCommand):
 
-	def add_arguments(self, parser):
-		parser.add_argument('level', nargs='+', type=int)
+	# def add_arguments(self, parser):
+	# 	parser.add_argument('level', nargs='+', type=int)
 		# print(parser)
 
 	def handle(self, *args, **options):
-		level = options['level'][0]
-
-		klist = Knowledge.objects.filter(level = level).order_by('chapter_id','parent_id', 'id')
+		klist = Knowledge.objects.order_by('chapter_id','parent_id', 'id')
 		paginator = Paginator(klist, 100)
 		# print(paginator.page_range)
 		for p in paginator.page_range:
@@ -21,9 +19,9 @@ class Command(BaseCommand):
 	def findparent(self, objects):
 		for knowledge in objects:
 			try:
-				knowledge.parent
+				knowledge.chapter
 			except Exception as e:
-				knowledge.status="alone"
-				knowledge.save()
-				# print(knowledge)
+				# knowledge.status="alone"
+				# knowledge.save()
+				print(knowledge)
 

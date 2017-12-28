@@ -9,6 +9,11 @@ class Book(models.Model):
 	created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
 	modified_at = models.DateTimeField(auto_now=True, auto_now_add=False)
 
+	def hasChildren(self):
+		count = self.chapter_set.count()
+		# print(count)
+		return count>0
+
 	def __str__(self):
 		return str(self.title)
 
@@ -21,6 +26,21 @@ class Chapter(models.Model):
 	meta =  models.TextField(null=True, blank=True)
 	created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
 	modified_at = models.DateTimeField(auto_now=True, auto_now_add=False)
+
+	def loadChildren(self, passon=False):
+		children = self.chapter_set.order_by('title', 'id')
+		if passon:
+			for chapter in children:
+				if chapter.id != self.id:
+					chapter.loadChildren()
+
+		self.children = children
+
+	def hasChildren(self):
+		kCount = self.knowledge_set.count()
+		cCount = self.chapter_set.count()
+		# print(kCount+cCount)
+		return kCount+cCount>0
 
 	def __str__(self):
 		prefix = ""
@@ -59,7 +79,7 @@ class Knowledge(models.Model):
 
 
 	def loadChildren(self, passon=False):
-		children = self.knowledge_set.order_by('title')
+		children = self.knowledge_set.order_by('title', 'id')
 		if passon:
 			for knowledge in children:
 				if knowledge.id != self.id:
@@ -107,6 +127,11 @@ class Knowledge(models.Model):
 			child.deleteAll()
 		self.delete()
 
+	def hasChildren(self):
+		childrenCount = self.knowledge_set.count()
+		return childrenCount>0
+
+
 	def __str__(self):
 		prefix = ""
 		for x in range(1,self.level):
@@ -117,6 +142,7 @@ class Knowledge(models.Model):
 class FileUpload(models.Model):
 	title = models.CharField(max_length=50, null=True, blank=True)
 	created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
+	book = models.ForeignKey('Book', on_delete=models.SET_NULL, default=None, blank=True, null=True)
 
 	def __str__(self):
 		return str(self.title)+" : "+str(created_at)
