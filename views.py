@@ -230,7 +230,10 @@ def rejectlist(request):
 				k.loadBook()
 				result.insert(0, k)
 				exist_ids.append(k.id)
-				k = k.parent
+				try:
+					k=k.parent
+				except Exception as e:
+					k=None
 			# while k.parent:
 			# 	k = k.parent
 			# 	root_id = k.id
