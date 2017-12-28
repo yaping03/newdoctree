@@ -27,6 +27,7 @@
 						<input type="checkbox" name="merge_ids[]" value="{{ parent.id }}"/>
 						<a target="_blank" href="{% url 'knowledge' parent.id %}">{{ parent.title }}</a>
 					</h4>
+					<span class="label label-{{ parent.statusClass }}">{{ parent.status }}</span>
 					<p class="lead">{{ parent.content }}</p>
 
 					{% if parent.children %}

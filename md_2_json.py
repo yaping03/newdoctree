@@ -71,7 +71,7 @@ def parse(path, json_path):
         line = line.strip()
         if not line:
             continue
-        print(line_no, line)
+        # print(line_no, line)
         form = check_format(line)
 
         if form == Md.BaseInfo and key_base_info not in data:
