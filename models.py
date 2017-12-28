@@ -74,7 +74,7 @@ class Knowledge(models.Model):
 			self.statusClass = "warning"
 		elif self.status=='pass':
 			self.statusClass = "success"
-		elif self.status=='reject':
+		elif self.status=='reject' or self.status=='alone':
 			self.statusClass = "danger"
 
 	def getStatusClass(self):
