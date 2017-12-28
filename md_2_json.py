@@ -71,7 +71,7 @@ def parse(path, json_path):
         line = line.strip()
         if not line:
             continue
-        # print(line_no, line)
+        print(line_no, line)
         form = check_format(line)
 
         if form == Md.BaseInfo and key_base_info not in data:
@@ -141,7 +141,7 @@ def parse(path, json_path):
                 original = data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1].get(key_content, "")
                 if original:
                     original = original+"\n"
-                    data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_content] = original+line
+                data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_content] = original+line
             elif last_l == 5:
                 original = data[key_l1][-1][key_l2][-1][key_l3][-1][key_l4][-1][key_l5][-1].get(key_content, "")
                 if original:
