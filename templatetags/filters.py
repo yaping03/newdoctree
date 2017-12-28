@@ -12,8 +12,8 @@ def page(request, p):
 
 @register.filter(name='is_selected')
 def is_selected(from_id, to_id):
-	result = ""
-	if from_id==to_id:
+	result = ""	
+	if from_id == str(to_id):
 		result = "selected"
 	return result
 
