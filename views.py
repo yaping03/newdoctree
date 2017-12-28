@@ -225,16 +225,18 @@ def rejectlist(request):
 			k = knowledge
 			root_id = k.id
 			result = []
-			k.loadBook()
-			# print(k.book)
-			result.insert(0, k)
-			exist_ids.append(k.id)
-			while k.parent:
-				k = k.parent
+			while k:
 				root_id = k.id
 				k.loadBook()
 				result.insert(0, k)
 				exist_ids.append(k.id)
+				k = k.parent
+			# while k.parent:
+			# 	k = k.parent
+			# 	root_id = k.id
+			# 	k.loadBook()
+			# 	result.insert(0, k)
+			# 	exist_ids.append(k.id)
 
 			result.insert(0,root_id)
 			results.append(result)
