@@ -102,7 +102,7 @@ class Knowledge(models.Model):
 			self.statusClass = "warning"
 		elif self.status=='pass':
 			self.statusClass = "success"
-		elif self.status=='reject':
+		elif self.status=='reject' or self.status=='alone':
 			self.statusClass = "danger"
 
 		return self.statusClass
@@ -130,6 +130,43 @@ class Knowledge(models.Model):
 	def hasChildren(self):
 		childrenCount = self.knowledge_set.count()
 		return childrenCount>0
+
+	def mergeFrom(self, knowledge):
+		if self.id != knowledge.id and self.level == knowledge.level:
+			knowledge.loadChildren()
+			self.loadChildren()
+
+			if not self.category and knowledge.category:
+				self.category = knowledge.category
+				self.save()
+
+			for child in knowledge.children:
+				# print(child)
+				child.parent = self
+				child.save()
+				# print("parent"+str(child.parent))
+
+			if not knowledge.content or self.content == knowledge.content:
+				# print("delete"+str(knowledge))
+				knowledge.delete()
+			else:
+				knowledge.title = knowledge.title+"_合并"
+				knowledge.parent = self
+				knowledge.level = self.level+1
+				knowledge.save()
+			self.reduceRedundance()
+
+	def reduceRedundance(self):
+		self.loadChildren()
+		lastTitle = None
+		lastKnowledge = None
+		for child in self.children:
+			if lastKnowledge and child.title and child.title==lastTitle:
+				lastKnowledge.mergeFrom(child)
+			else :
+				lastKnowledge = child
+				lastTitle = child.title
+			
 
 
 	def __str__(self):
