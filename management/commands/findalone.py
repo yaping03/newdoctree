@@ -23,7 +23,7 @@ class Command(BaseCommand):
 			try:
 				knowledge.parent
 			except Exception as e:
-				# knowledge.status="alone"
-				# knowledge.save()
-				print(knowledge)
+				knowledge.is_alone=True
+				knowledge.save()
+				# print(knowledge)
 

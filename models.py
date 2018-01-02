@@ -57,6 +57,7 @@ class Knowledge(models.Model):
 	level = models.SmallIntegerField(default=0, blank=True) 
 	content = models.TextField(null=True, blank=True)
 	status = models.CharField(max_length=20, default="pending")
+	is_alone = models.BooleanField(default=False)
 	meta = models.TextField(null=True, blank=True)
 	created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
 	modified_at = models.DateTimeField(auto_now=True, auto_now_add=False)
