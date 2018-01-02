@@ -129,7 +129,11 @@ def kwlist(request):
 	
 	klist = Knowledge.objects.filter(level=4)
 	if request.GET.get('status'):
-		klist = klist.filter(status=request.GET.get('status'))
+		status = request.GET.get('status')
+		if status=="alone":
+			klist = klist.filter(is_alone=True)
+		else:
+			klist = klist.filter(status=request.GET.get('status'))
 	if request.GET.get('book_id'):
 		chapter_ids = Chapter.objects.filter(book_id=request.GET.get('book_id')).values_list('id',flat=True)
 		klist = klist.filter(chapter_id__in=chapter_ids)
