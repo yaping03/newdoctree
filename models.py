@@ -72,7 +72,12 @@ class Knowledge(models.Model):
 
 	def loadBook(self):
 		# print(123)
-		self.book = self.chapter.book
+		try:
+			self.book = self.chapter.book
+		except Exception as e:
+			print("no book : "+str(self))
+			self.book = None
+		
 		# print(self.book)
 
 	# def loadParent(self):

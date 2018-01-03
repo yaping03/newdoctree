@@ -207,7 +207,8 @@ def show_relationship(request, title):
 	return render(request, 'doctree/show_relationship.html', context)
 
 def rejectlist(request):
-	klist = Knowledge.objects.filter(status='reject').order_by('chapter_id', '-level', 'parent_id', 'id')
+	status=request.GET.get('status', 'reject')
+	klist = Knowledge.objects.filter(status=status).order_by('chapter_id', '-level', 'parent_id', 'id')
 	paginator = Paginator(klist, 25)
 	page = request.GET.get('page')
 
@@ -245,7 +246,6 @@ def rejectlist(request):
 	context = { 'knowledges' : knowledges, 'near_range' : r, 'results' : results }
 
 	return render(request, 'doctree/rejectlist.html', context)
-
 
 def near_range(pagination):
 	half_range = 3

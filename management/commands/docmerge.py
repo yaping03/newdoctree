@@ -12,49 +12,35 @@ class Command(BaseCommand):
 		lastId = 0
 		length = 20
 
-		knowledges = Knowledge.objects.filter(level=4, id__gt=lastId).order_by('id')[:length]
-		while knowledges.count()>0:
-			for knowledge in knowledges:
-				self.merge(knowledge.title)
-				if knowledge.id>lastId:
-					lastId = knowledge.id
-					print("lastId"+str(lastId))
-			knowledges = Knowledge.objects.filter(level=4, id__gt=lastId).order_by('id')[:length]
+		books = Book.objects.all()
+		# print(books)
+		for book in books:
+			chapters = book.chapter_set.values_list('id', flat=True)
+			# print(chapters)
+			lastId = 0
+			knowledges = Knowledge.objects.filter(level=4, id__gt=lastId, chapter__in=chapters).order_by('id')[:length]
+			while knowledges.count()>0:
+				for knowledge in knowledges:
+					self.merge(knowledge.title, chapters)
+					if knowledge.id>lastId:
+						lastId = knowledge.id
+						print("lastId"+str(lastId))
+				knowledges = Knowledge.objects.filter(level=4, id__gt=lastId, chapter__in=chapters).order_by('id')[:length]
 
-	def merge(self, title):
-		knowledges = Knowledge.objects.filter(level=4, title=title)
+	def merge(self, title, chapters):
+		knowledges = Knowledge.objects.filter(level=4, title=title, chapter__in=chapters)
 		
 		childrenCount = {} #l4id : l5count
-		bookChildren = {} #bookid : l4count+l5count
-		bookCount = {} #l4id : bookid
 
 		for knowledge in knowledges:
 			knowledge.loadChildren()
-			knowledge.loadBook()
 			childrenCount[knowledge.id] = knowledge.children.count()
-			bookCount[knowledge.id] = knowledge.book.id
 
-		# print(childrenCount)
-		for kid, children in childrenCount.items():
-			bookid = bookCount[kid]
-			count = bookChildren.get(bookid,0)
-			cnt = count+children
-			bookChildren[bookid] = cnt
-
-		maxCount = 0
-		maxBook = 0
-
-		for bookid, children in bookChildren.items():
-			if children>maxCount:
-				maxCount = children
-				maxBook = bookid
-
-		# print(childrenCount)
 		maxCount = 0
 		maxKnowledge = 0
+
 		for kid, children in childrenCount.items():
-			# print(kid, children)
-			if bookCount[kid] == maxBook and children>=maxCount:
+			if children>maxCount:
 				maxCount = children
 				maxKnowledge = kid
 
