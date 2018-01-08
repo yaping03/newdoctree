@@ -11,10 +11,16 @@ class Command(BaseCommand):
 	def handle(self, *args, **options):
 		folderPath = options['dir'][0]
 		files = os.listdir(folderPath)
-		willUpload = True
+		
 		for file in files:
+			willUpload = True
 			if self.isJson(file):
-				uploaded = FileUpload.objects.filter(title=file).order_by('-book_id','-created_at')[0]
+				uploaded = FileUpload.objects.filter(title=file).order_by('-book_id','-created_at')
+				book = None
+				if uploaded.count():
+					uploaded = uploaded[0]
+				else:
+					upload = None
 				if uploaded:
 					try:
 						book = uploaded.book

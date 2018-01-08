@@ -175,6 +175,7 @@ def check_format(text):
     :param text:
     :return:
     """
+    print(text)
     if text == '# 基本信息':
         return Md.BaseInfo
 
@@ -188,7 +189,7 @@ def check_format(text):
         return Md.List
 
     oli = text.split('. ', 1)
-    if oli[0].isdigit():
+    if len(oli)>1 and oli[0].isdigit():
         return Md.List
 
     key_title = '书名'
@@ -231,6 +232,7 @@ def get_type(text):
     return ds[1]
 
 def get_list_line(text):
+    # print(text)
     if text.startswith('- '):
         return text[2:]
 
