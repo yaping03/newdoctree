@@ -17,9 +17,15 @@
 				{% for relationship in relationships %}
 				<tr>
 					<td>
+						{% if level is 5 %}
 						<a target="_blank" href="/show_relationship/{{relationship.title}}">
 							{{ relationship.title }}
 						</a>
+						{% elif level is 4 %}
+						<a target="_blank" href="/doctree/{{relationship.title}}">
+							{{ relationship.title }}
+						</a>
+						{% endif %}
 					</td>
 					<td>
 						{{ relationship.count }}

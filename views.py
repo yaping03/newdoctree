@@ -167,7 +167,13 @@ def kwlist(request):
 	return render(request, 'doctree/kwlist.html', context)
 
 def l5list(request):
-	rlist = Knowledge.objects.filter(level=5).values('title').annotate(count=Count('id')).order_by('-count')
+	level = int(request.GET.get('level', 5))
+	status = request.GET.get('status')
+	
+	if status:
+		rlist = Knowledge.objects.filter(level=level, status=status).values('title').annotate(count=Count('id')).order_by('-count')
+	else :
+		rlist = Knowledge.objects.filter(level=level).values('title').annotate(count=Count('id')).order_by('-count')
 	paginator = Paginator(rlist, 50)
 	page = request.GET.get('page')
 
@@ -178,9 +184,12 @@ def l5list(request):
 	except EmptyPage:
 	    relationships = paginator.page(paginator.num_pages)
 
+	for rel in relationships:
+		print(rel)
+
 	r = near_range(relationships)
 
-	context = { 'relationships' : relationships, 'near_range' : r }
+	context = { 'relationships' : relationships, 'near_range' : r, 'level':level }
 
 	return render(request, 'doctree/l5list.html', context)
 
