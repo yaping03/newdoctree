@@ -9,8 +9,8 @@
 		<table class="table table-bordered table-striped">
 			<thead>
 				<tr>
-					<th>ID</th>
 					<th>书名</th>
+					<th>ID</th>
 					<th>整理者</th>
 					<th>PENDING</th>
 					<th>PASS</th>
@@ -18,23 +18,29 @@
 				</tr>
 			</thead>
 			<tbody>
-				{% for book in books %}
-				<tr>
-					<td>{{ book.id }}</td>
-					<td>
-						{{ book.title }}
-					</td>
-					<td>{{ book.summarized }}</td>
-					<td>
-						{{ book.statusCount.pending }}
-					</td>
-					<td>
-						{{ book.statusCount.pass }}
-					</td>
-					<td>
-						{{ book.statusCount.reject }}
-					</td>
-				</tr>
+				{% for aggregate in aggregates%}
+					{% for i, book in aggregate|enum %}
+						<tr>
+							{% if i is 0 %}
+							<td rowspan="{{ aggregate|length }}" style="vertical-align: middle">
+								{{ book.title }}
+							</td>
+							{% endif %}
+							<td>
+								{{ book.id }}
+							</td>
+							<td>{{ book.summarized }}</td>
+							<td>
+								{{ book.statusCount.pending }}
+							</td>
+							<td>
+								{{ book.statusCount.pass }}
+							</td>
+							<td>
+								{{ book.statusCount.reject }}
+							</td>
+						</tr>
+					{% endfor %}
 				{% endfor %}
 			</tbody>
 		</table>

@@ -40,3 +40,8 @@ def none_2_null(str):
 	if (not str) or str.lower()=="none":
 		result = ""
 	return result
+
+@register.filter(name="enum")
+def enum(arr):
+
+	return enumerate(arr)

@@ -265,10 +265,18 @@ def rejectlist(request):
 
 def booklist(request):
 	books = Book.objects.order_by('title', 'summarized', 'id').all()
+	aggregates = []
+	last = None
 	for book in books:
 		book.checkFinished()
+		if last and last==book.title:
+			aggregates[-1].append(book)
+		else:
+			last = book.title
+			aggregates.append([book])
 	
-	context = { 'books':books }
+	context = { 'aggregates':aggregates , 'index':range(0,len(aggregates))}
+	print(context)
 
 	return render(request, 'doctree/booklist.html', context)
 
