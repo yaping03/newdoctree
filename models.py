@@ -188,5 +188,5 @@ class FileUpload(models.Model):
 	book = models.ForeignKey('Book', on_delete=models.SET_NULL, default=None, blank=True, null=True)
 
 	def __str__(self):
-		return str(self.title)+" : "+str(created_at)
+		return str(self.title)
 
