@@ -210,7 +210,8 @@ def rejectlist(request):
 	status=request.GET.get('status', 'reject')
 	klist = Knowledge.objects.filter(status=status).order_by('chapter_id', '-level', 'parent_id', 'id')
 	if request.GET.get('book_id'):
-		chapter_ids = Chapter.objects.filter(book_id=request.GET.get('book_id')).values_list('id',flat=True)
+		ids = request.GET.get('book_id').split(',')
+		chapter_ids = Chapter.objects.filter(book_id__in=ids).values_list('id',flat=True)
 		klist = klist.filter(chapter_id__in=chapter_ids)
 	paginator = Paginator(klist, 25)
 	page = request.GET.get('page')
