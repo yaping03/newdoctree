@@ -135,6 +135,8 @@ def kwlist(request):
 		else:
 			klist = klist.filter(status=request.GET.get('status'))
 	if request.GET.get('book_id'):
+		book = Book.objects.get(id=request.GET.get('book_id'))
+		book.checkFinished()
 		chapter_ids = Chapter.objects.filter(book_id=request.GET.get('book_id')).values_list('id',flat=True)
 		klist = klist.filter(chapter_id__in=chapter_ids)
 	if request.GET.get('search'):
@@ -259,6 +261,16 @@ def rejectlist(request):
 	context = { 'knowledges' : knowledges, 'near_range' : r, 'results' : results }
 
 	return render(request, 'doctree/rejectlist.html', context)
+
+
+def booklist(request):
+	books = Book.objects.order_by('title', 'summarized', 'id').all()
+	for book in books:
+		book.checkFinished()
+	
+	context = { 'books':books }
+
+	return render(request, 'doctree/booklist.html', context)
 
 def near_range(pagination):
 	half_range = 3

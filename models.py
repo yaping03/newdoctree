@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your models here.
 class Book(models.Model):
 	title = models.CharField(max_length=50, null=True, blank=True)
@@ -13,6 +14,16 @@ class Book(models.Model):
 		count = self.chapter_set.count()
 		# print(count)
 		return count>0
+
+	def checkFinished(self):
+		chapters = self.chapter_set.values_list('id',flat=True)
+		cnt = Knowledge.objects.filter(chapter_id__in=chapters).values('status').annotate(count=models.Count('id')).all()
+		
+		count = {}
+		for c in cnt:
+			count[c['status']] = c['count']
+
+		self.statusCount = count
 
 	def __str__(self):
 		return str(self.title)
