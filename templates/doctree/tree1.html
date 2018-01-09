@@ -25,7 +25,7 @@
 					<input type="radio" name="merge_to" value="{{ parent.id }}"/>合并到
 					<h4>
 						<input type="checkbox" name="merge_ids[]" value="{{ parent.id }}"/>
-						<a target="_blank" href="{% url 'knowledge' parent.id %}">{{ parent.title }}</a>
+						<a target="_blank" href="/knowledge/{{parent.id}}">{{ parent.title }}</a>
 					</h4>
 					<span class="label label-{{ parent.statusClass }}">{{ parent.status }}</span>
 					<p class="lead">{{ parent.content }}</p>

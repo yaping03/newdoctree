@@ -264,7 +264,19 @@ def rejectlist(request):
 
 
 def booklist(request):
-	books = Book.objects.order_by('title', 'summarized', 'id').all()
+	blist = Book.objects.order_by('title', 'summarized', 'id')
+	paginator = Paginator(blist, 25)
+	page = request.GET.get('page')
+
+	try:
+	    books = paginator.page(page)
+	except PageNotAnInteger:
+	    books = paginator.page(1)
+	except EmptyPage:
+	    books = paginator.page(paginator.num_pages)
+
+	r = near_range(books)
+
 	aggregates = []
 	last = None
 	for book in books:
@@ -275,9 +287,8 @@ def booklist(request):
 			last = book.title
 			aggregates.append([book])
 	
-	context = { 'aggregates':aggregates , 'index':range(0,len(aggregates))}
-	print(context)
-
+	context = { 'aggregates':aggregates , 'books':books, 'near_range' : r}
+	
 	return render(request, 'doctree/booklist.html', context)
 
 def near_range(pagination):

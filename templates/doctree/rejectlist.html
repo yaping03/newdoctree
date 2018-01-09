@@ -18,7 +18,7 @@
 				{% for result in results %}
 				<tr>
 					<td>
-						<a target="_blank" href="{% url 'knowledge' result.1.id %}">
+						<a target="_blank" href="/knowledge/{{result.1.id}}">
 							<span class="label label-{{ result.1.getStatusClass }}">
 
 								{{ result.1.title }}
