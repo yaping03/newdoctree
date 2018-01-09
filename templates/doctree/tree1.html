@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="panel panel-default">
-	<form method="POST" action="{% url 'docmerge' %}">
+	<form method="POST" action="/docmerge">
 		{% csrf_token %}
 		<input type="hidden" name="prev_url" value="{{ request.path }}"/>
 		<div class="panel-heading">
