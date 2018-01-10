@@ -13,7 +13,7 @@ class Command(BaseCommand):
 		# print(parser)
 
 	def handle(self, *args, **options):
-		print(options)
+		
 		bookids = options['bookid']
 		keeps = options['keep']
 		

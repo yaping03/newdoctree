@@ -1,4 +1,5 @@
 from django.db import models
+import json
 
 
 # Create your models here.
@@ -24,6 +25,23 @@ class Book(models.Model):
 			count[c['status']] = c['count']
 
 		self.statusCount = count
+
+		# merge from fromBook to self
+		# if fromBook==None, merge self indexes
+	def mergeBook(self, fromBook=None):
+		if fromBook and fromBook.id is not self.id:
+			fromChapters = Chapter.objects.filter(book_id=fromBook.id).values_list('id',flat=True)
+			content = json.dumps(list(fromChapters), ensure_ascii=False)
+			
+			BookIndex.objects.create(book_id=fromBook.id, book_info=fromBook.serialize(), chapters = content)
+
+			Chapter.objects.filter(book_id=fromBook.id).update(book_id=self.id)
+			fromBook.delete()
+
+		# TODO: merge self indexes
+	
+	def serialize(self):
+		return str(self.id)+" "+self.title+" "+self.summarized
 
 	def __str__(self):
 		return str(self.title)
@@ -69,6 +87,7 @@ class Knowledge(models.Model):
 	content = models.TextField(null=True, blank=True)
 	status = models.CharField(max_length=20, default="pending")
 	is_alone = models.BooleanField(default=False)
+	is_link = models.BooleanField(default=False)
 	meta = models.TextField(null=True, blank=True)
 	created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
 	modified_at = models.DateTimeField(auto_now=True, auto_now_add=False)
@@ -103,6 +122,23 @@ class Knowledge(models.Model):
 					knowledge.loadChildren()
 
 		self.children = children
+
+	def superParent(self):
+		result = self
+		parent = self
+		hasParent = True
+		while hasParent:
+			try:
+				parent = result.parent
+				if parent:
+					result = parent
+				else:
+					hasParent = False
+			except Exception as e:
+				hasParent = False
+
+		self.rootParent = result
+		return result
 
 	def loadLevel(self, passon=False):
 		self.span = 7-self.level
@@ -200,4 +236,25 @@ class FileUpload(models.Model):
 
 	def __str__(self):
 		return str(self.title)
+
+class BookIndex(models.Model):
+	book_id =  models.IntegerField()
+	book_info = models.TextField() 
+	chapters = models.TextField(null=True)
+	created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
+
+class LinkMissing(models.Model):
+	heading = models.ForeignKey('Knowledge', related_name='heading', on_delete=models.SET_NULL, blank=True, null=True) #level4
+	source = models.ForeignKey('Knowledge', related_name='source', on_delete=models.CASCADE, blank=True, null=True) #close level
+	word = models.TextField(null=True)
+	link = models.ForeignKey('Knowledge', related_name='link', on_delete=models.CASCADE, blank=True, null=True)
+	status = models.CharField(max_length=20, default="pending")
+	created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
+	modified_at = models.DateTimeField(auto_now=True, auto_now_add=False)
+
+
+	def __str__(self):
+		return word
+
+
 

@@ -237,7 +237,7 @@ def get_list_line(text):
         return text[2:]
 
     oli = text.split('. ', 1)
-    return oli[1]
+    return oli[1].strip()
 
 @unique
 class Md(Enum):

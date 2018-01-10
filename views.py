@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.db.models import Count
-from doctree.models import Knowledge, Chapter, Book
+from django.db.models.functions import Length, Upper
+from doctree.models import Knowledge, Chapter, Book, LinkMissing
 from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -290,6 +291,40 @@ def booklist(request):
 	context = { 'aggregates':aggregates , 'books':books, 'near_range' : r}
 	
 	return render(request, 'doctree/booklist.html', context)
+
+def linkmissing(request):
+	mlist = LinkMissing.objects
+	status=request.GET.get('status')
+	sort=request.GET.get('sort')
+	if status:
+		mlist = mlist.filter(status = status)
+	if int(sort)<0:
+		mlist = mlist.order_by(Length('word').desc())
+	elif int(sort)>0:
+		mlist = mlist.order_by(Length('word'))
+	else:
+		mlist = mlist.order_by('heading','source','link','id')
+
+	paginator = Paginator(mlist, 50)
+	page = request.GET.get('page')
+
+	try:
+	    links = paginator.page(page)
+	except PageNotAnInteger:
+	    links = paginator.page(1)
+	except EmptyPage:
+	    links = paginator.page(paginator.num_pages)
+
+	r = near_range(links)
+
+	for link in links:
+		link.heading
+		link.source
+		link.link
+
+	context = { 'links':links , 'near_range' : r}
+
+	return render(request, 'doctree/linkmissing.html', context)
 
 def near_range(pagination):
 	half_range = 3
