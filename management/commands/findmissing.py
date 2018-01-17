@@ -1,11 +1,51 @@
 from django.core.management.base import BaseCommand
 from doctree.models import Book, Chapter, Knowledge, FileUpload, LinkMissing
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-import json
+import json, csv
 
 class Command(BaseCommand):
 
+	def add_arguments(self, parser):
+		parser.add_argument('dir', type=str)
+
+
 	def handle(self, *args, **options):
+		folder = options['dir']
+		klist = Knowledge.objects.filter(content__startswith="[", content__endswith="]").all()
+		csvFile = folder+"/"+"linking.csv"
+
+		lines = []
+		for knowledge in klist:
+			linking = self.checkmissing(knowledge)
+			lines.extend(linking)
+
+		# lines = [["a"],["ab"], ["abc"], ["abcde"], ["abcd"]]
+		lines.sort(key=lambda line: len(line[1]))
+
+		# print(lines)
+
+		with open(csvFile, 'w', newline='') as f:
+			writer = csv.writer(f)
+			writer.writerows(lines)
+
+	def checkmissing(self, knowledge):
+		results = []
+		try:
+			linkList = json.loads(knowledge.content)
+			for word in linkList:
+				word = word.strip()
+				cnt = Knowledge.objects.filter(title=word, level=4).count()
+				if cnt<=0:
+					results.append([knowledge.id, word, cnt])
+		except Exception as e:
+			self.stdout.write("Not List : "+str(knowledge) + knowledge.content)
+
+		return results
+
+
+'''
+	def handle(self, *args, **options):
+		folder = options['dir']
 		klist = Knowledge.objects.filter(content__startswith="[", content__endswith="]").order_by('chapter_id','parent_id', 'id')
 		paginator = Paginator(klist, 100)
 		# print(paginator.page_range)
@@ -49,7 +89,7 @@ class Command(BaseCommand):
 
 		return result
 
-		
+
 	def findtarget(self, word, source, link=None):
 		targets = Knowledge.objects.filter(title=word, level=4).order_by('status', 'id')
 		if targets.count():
@@ -66,6 +106,7 @@ class Command(BaseCommand):
 			LinkMissing.objects.create(heading = source.superParent(), source = source, word=word)
 
 
+'''	
 	
 
 

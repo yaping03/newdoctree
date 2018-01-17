@@ -73,6 +73,7 @@ def docmerge(request):
 
 def knowledge(request, kid):
 	knowledge = Knowledge.objects.get(id=kid)
+	knowledge = knowledge.superParent()
 	knowledge.loadAll()
 
 	context = { 'knowledge' : knowledge , 'start' : knowledge.level }
