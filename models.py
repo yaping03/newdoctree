@@ -160,6 +160,14 @@ class Knowledge(models.Model):
 
 		return self.statusClass
 
+	def getFormatContent(self):
+		try:
+			contentList = json.loads(self.content)
+			return contentList
+		except Exception as e:
+			return self.content
+
+
 	def setLevel(self, toLevel):
 		self.level = toLevel
 		self.save()
