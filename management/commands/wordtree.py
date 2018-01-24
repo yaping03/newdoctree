@@ -7,17 +7,28 @@ from django.db.models.functions import Length, Upper
 class Command(BaseCommand):
 
 	def add_arguments(self, parser):
-		parser.add_argument('--word', dest='word',help='Needle word')
+		parser.add_argument('--word', nargs='+', dest='word',help='Needle word')
 		parser.add_argument('--dir', dest='dir', help='To folder')
 		# print(parser)
 
 	def handle(self, *args, **options):
 		# print(options)
-		word = options['word']
-		word = word.strip()
+		words = options['word']
+		name = "_".join(words)
 		folder = options['dir']
-		csvFile = folder+"/"+word+"_tree.csv"
+		csvFile = folder+"/"+name+"_tree.csv"
 
+		words = options['word']
+		lines = []
+		for word in words:
+			word = word.strip()
+			lines.extend(self.wordlines(word))
+
+		with open(csvFile, 'w', newline='') as f:
+			writer = csv.writer(f)
+			writer.writerows(lines)
+		
+	def wordlines(self, word):
 		knowledges = Knowledge.objects.filter(level=4, title__contains=word).order_by(Length('title'))
 
 		klist = []
@@ -46,9 +57,7 @@ class Command(BaseCommand):
 
 		# print(lines)
 
-		with open(csvFile, 'w', newline='') as f:
-			writer = csv.writer(f)
-			writer.writerows(lines)
+		return lines
 
 	def aggregate(self, klist, depth=0):
 		results = []
