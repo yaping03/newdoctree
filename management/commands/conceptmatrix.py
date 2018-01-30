@@ -157,12 +157,14 @@ class Command(BaseCommand):
 		total = 0
 		for family in series:
 			cnt = 0
+			pos = len(row)
+			row.append(0)
 			for col in family:
 				value = values_dict.get(col)
 				row.append(value)
 				if value:
 					cnt = cnt+1
-			row.append(cnt)
+			row[pos] = cnt
 			total = total+cnt
 
 		row[1] = total
