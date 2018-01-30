@@ -7,6 +7,7 @@ class Command(BaseCommand):
 
 	attributes = []
 	core_words = []
+	# words_only = False
 
 	def add_arguments(self, parser):
 		# parser.add_argument('--attr', dest="attr", type=str)
@@ -17,6 +18,10 @@ class Command(BaseCommand):
 	def handle(self, *args, **options):
 		folder_path = os.path.dirname(os.path.dirname(__file__))+"/resources"
 		attr_file = folder_path+"/attributes.csv"
+		# words_file = options.get(words) 
+		# if words_file:
+		# 	words_only = True
+		# else:
 		words_file = folder_path+"/words.txt"
 		dir = options['dir']
 		xls_file = dir+"/matrix.xls"
@@ -27,20 +32,16 @@ class Command(BaseCommand):
 		book = xlwt.Workbook(encoding='utf-8', style_compression=0)
 
 		for key, series in self.attributes.items():
-			
 			self.create_sheet(book, key, series)
 			# break
 
 		book.save(xls_file)
 
 	def create_sheet(self, book, key, series):
-		# print(key)
-		# sheet = book.add_sheet(key, cell_overwrite_ok=True)
 		data = {}
 		words = []
 
 		for family in series:
-			# print(family[0])
 			family_data = self.family_data(family, words)
 			self.merge_dict(data, family_data)
 
@@ -65,7 +66,7 @@ class Command(BaseCommand):
 			
 
 		# matrix.append([0 for x in range(len(headings))])
-
+		# if not words_only:
 		for word in rows:
 			word_node = data.get(word)
 			if word_node:
