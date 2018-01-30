@@ -141,10 +141,10 @@ class Command(BaseCommand):
 
 	def get_heading(self, series):
 		heading0 = [None, None]
-		heading1 = ["词语", "计数"]
+		heading1 = ["词语", "总计"]
 		for family in series:
-			heading1.extend(family)
 			heading1.append("计数")
+			heading1.extend(family)
 
 			heading0.append(family[0])
 			heading0.extend([None for x in range(len(family)-1)])
