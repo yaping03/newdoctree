@@ -67,9 +67,9 @@ class Command(BaseCommand):
 		# matrix.append([0 for x in range(len(headings))])
 
 		for word in rows:
-			word_node = data.get(cword)
+			word_node = data.get(word)
 			if word_node:
-				row = self.get_row(cword, word_node, series)
+				row = self.get_row(word, word_node, series)
 				matrix.append(row)
 			
 		sheet = book.add_sheet(key, cell_overwrite_ok=True)
