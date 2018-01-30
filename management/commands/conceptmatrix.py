@@ -29,7 +29,7 @@ class Command(BaseCommand):
 		for key, series in self.attributes.items():
 			
 			self.create_sheet(book, key, series)
-			break
+			# break
 
 		book.save(xls_file)
 
