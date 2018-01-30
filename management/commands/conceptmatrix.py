@@ -77,7 +77,10 @@ class Command(BaseCommand):
 		for i in list(range(len(matrix))):
 			row = matrix[i]
 			for j in list(range(len(row))):
-				sheet.write(i, j, row[j])
+				if row[j]:	
+					sheet.write(i, j, row[j])
+				else:
+					sheet.write(i, j, ' ')
 
 		# print(json.dumps(data, ensure_ascii=False))
 		# ftool.write_json(data, os.path.dirname(os.path.dirname(__file__))+"/data/matrix.json")
