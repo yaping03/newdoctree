@@ -94,7 +94,7 @@ class Command(BaseCommand):
 			if parent.title:
 				parent_node = results.setdefault(parent.title.strip(), {})
 				if knowledge.content:
-					parent_node[knowledge.title] = "【%d】%s" % (knowledge.id, knowledge.content)
+					parent_node[knowledge.title] = "%s【%d】" % (knowledge.content, knowledge.id)
 				words.append(parent.title)
 
 		return results
