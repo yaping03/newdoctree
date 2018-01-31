@@ -1,0 +1,38 @@
+<tr>
+	<td>
+		<input type="radio" name="merge_to" value="{{ knowledge.id }}"/>
+	</td>
+	<td>
+		<input type="checkbox" name="merge_ids[]" value="{{ knowledge.id }}"/>
+	</td>
+	<td>{{ knowledge.level }}</td>
+	<td>
+		{{ knowledge.id }}
+	</td>
+	
+	{% for i in knowledge.range %}
+		<td>&nbsp;</td>
+	{% endfor %}
+
+	<td colspan="{{ knowledge.span }}" class="doctree-level-{{knowledge.level}}">
+		<a target="_blank" href="/admin/doctree/knowledge/{{knowledge.id}}/change">
+			{{ knowledge.title }}
+		</a>
+		<span class="label label-{{ knowledge.statusClass }}">{{ knowledge.status }}</span>
+		{% if knowledge.content %}
+		<button type="button" class="btn btn-default btn-sm" data-toggle="collapse"  data-target="#kw-{{ knowledge.id }}">
+			内容
+		</button>
+
+		<div id="kw-{{ knowledge.id }}" class="collapse">
+			{{ knowledge.content }}
+		</div>
+		{% endif %}
+	</td>
+	<td>
+		<ul>
+			<li>{{ knowledge.book.title }}</li>
+			<li>{{ knowledge.book.summarized }}</li>
+		</ul>
+	</td>
+</tr>
