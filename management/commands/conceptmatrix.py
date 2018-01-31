@@ -32,6 +32,7 @@ class Command(BaseCommand):
 		book = xlwt.Workbook(encoding='utf-8', style_compression=0)
 
 		for key, series in self.attributes.items():
+			# if key == '分类':
 			self.create_sheet(book, key, series)
 			# break
 
@@ -41,9 +42,13 @@ class Command(BaseCommand):
 		data = {}
 		words = []
 
+		print(series)
+
 		for family in series:
 			family_data = self.family_data(family, words)
 			self.merge_dict(data, family_data)
+
+		# print(data)
 
 		headings = self.get_heading(series)
 		rows = set(words)
@@ -94,10 +99,11 @@ class Command(BaseCommand):
 			parent = knowledge.superParent()
 			if parent.title:
 				parent_node = results.setdefault(parent.title.strip(), {})
-				if knowledge.content:
+				if knowledge:
 					parent_node[knowledge.title] = "%s【%d】" % (knowledge.content, knowledge.id)
 				words.append(parent.title)
 
+		# print(results)
 		return results
 
 	def merge_dict(self, root, merge_from):

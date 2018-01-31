@@ -264,5 +264,40 @@ class LinkMissing(models.Model):
 	def __str__(self):
 		return word
 
+class Law(models.Model):
+	name = models.CharField(max_length=32)
+	organization = models.CharField(max_length=32)
+	short_name = models.CharField(max_length=12,null=True,blank=True)
+	publish_date = models.DateField(null=True,blank=True)
+	start_date = models.DateField(null=True,blank=True)
+	end_date = models.DateField(null=True,blank=True)
+	modify_date = models.DateField(null=True,blank=True)
+	type = models.CharField(max_length=32,null=True,blank=True)
+	meta = models.TextField(null=True, blank=True)
+	created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
+	modified_at = models.DateTimeField(auto_now=True, auto_now_add=False)
 
+	def __str__(self):
+		return self.name
+
+
+class Title(models.Model):
+	parent_num = models.IntegerField(null=True,blank=True)
+	self_num = models.IntegerField(null=True,blank=True)
+	law = models.ForeignKey("Law",on_delete=models.CASCADE)
+	name = models.CharField(max_length=64)
+	level = models.CharField(max_length=1)
+	parent = models.ForeignKey("Title",null=True,blank=True,on_delete=models.CASCADE)
+	def __str__(self):
+		return self.name
+
+class Provision(models.Model):
+	law = models.ForeignKey("Law",on_delete=models.CASCADE)
+	num = models.IntegerField(default=0)
+	parent = models.ForeignKey("Title",null=True,blank=True,on_delete=models.CASCADE)
+	content = models.TextField(default="")
+	types = models.CharField(max_length=4)
+	serial_number = models.CharField(max_length=12)
+	def __str__(self):
+		return self.serial_number
 
