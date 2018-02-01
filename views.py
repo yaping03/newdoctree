@@ -344,10 +344,27 @@ def near_range(pagination):
 def lawlist(request):
     if request.method == "GET":
         law_query = models.Law.objects.all()
+        page_num = int(request.GET.get("page"))
+        if not page_num:
+            page_num=1
+        paginator = Paginator(law_query, 10)
+
+        if paginator.num_pages > 10:
+
+            if page_num - 5 < 1:
+                pageRange = range(1, 11)
+            elif page_num + 5 > paginator.num_pages:
+                pageRange = range(page_num - 5, paginator.num_pages + 1)
+            else:
+                pageRange = range(page_num - 5, page_num + 5)
+        else:
+            pageRange = paginator.page_range
+
+        law_query = paginator.page(page_num)
     else:
         return HttpResponse("ERROR!")
 
-    return render(request,"doctree/lawlist.html",{"law_query":law_query})
+    return render(request,"doctree/lawlist.html",{"law_query":law_query,"num_pages":pageRange,"paginator":paginator,"page_num":page_num})
 
 def law_title(request,law_id):
     if request.method == "GET":
