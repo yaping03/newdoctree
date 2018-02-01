@@ -1,7 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render,HttpResponse,redirect
 from django.db.models import Count
 from django.db.models.functions import Length, Upper
 from doctree.models import Knowledge, Chapter, Book, LinkMissing
+from doctree import models
 from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -338,3 +339,49 @@ def near_range(pagination):
 		end = pagination.paginator.num_pages
 
 	return range(start, end+1)
+
+
+def lawlist(request):
+    if request.method == "GET":
+        law_query = models.Law.objects.all()
+    else:
+        return HttpResponse("ERROR!")
+
+    return render(request,"doctree/lawlist.html",{"law_query":law_query})
+
+def law_title(request,law_id):
+    if request.method == "GET":
+        law = models.Law.objects.filter(id=law_id).first()
+        ed_titles = models.Title.objects.filter(law_id=law_id,level="编")
+        chapter_titles = models.Title.objects.filter(law_id=law_id,level="章")
+        section_titles = models.Title.objects.filter(law_id=law_id,level="节")
+        if not ed_titles and not chapter_titles and not section_titles:
+            return redirect("/provision/"+str(law_id)+"/"+"provision"+"/"+"0")
+
+    else:
+        return HttpResponse("ERROR!")
+    return render(request,"doctree/lawtitle.html",{"law":law,"ed_titles":ed_titles,"chapter_titles":chapter_titles,"section_titles":section_titles})
+
+def provision_view(request,law_id,types,parent_id=None):
+    if request.method == "GET":
+        law = models.Law.objects.filter(id=law_id).first()
+        if parent_id:
+            now = models.Title.objects.filter(id=parent_id).first()
+            now = "第"+str(now.self_num)+now.level+":"+now.name
+        else:
+            now = ""
+        if types == "chapter":
+            provisions = models.Provision.objects.filter(law_id=law_id,types="章条文",parent_id=parent_id)
+            if not provisions:
+                parent = models.Title.objects.filter(law_id=law_id,parent_id=parent_id,level="节")
+                parents = []
+                for i in parent:
+                    parents.append(i.id)
+                provisions = models.Provision.objects.filter(law_id=law_id,types="节条文",parent_id__in=parents)
+        elif types == "section":
+            provisions = models.Provision.objects.filter(law_id=law_id, types="节条文",parent_id=parent_id)
+        elif types == "provision":
+            provisions = models.Provision.objects.filter(law_id=law_id, types="条文")
+    else:
+        return HttpResponse("ERROR!")
+    return render(request,"doctree/provision.html",{"law":law,"provisions":provisions,"now":now})

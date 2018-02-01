@@ -1,0 +1,42 @@
+{% load bootstrap3 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="container">
+<div class="h2 Center aligned text">法律信息</div>
+<table class="table table-bordered table-striped">
+    <tr>
+        <th>ID</th>
+        <th>名称</th>
+        <th>单位</th>
+        <th>简称</th>
+        <th>颁布日期</th>
+        <th>修订日期</th>
+        <th>实施日期</th>
+        <th>结束日期</th>
+        <th>类型</th>
+    </tr>
+    {% for law in law_query %}
+        <tr>
+            <td>{{ law.id }}</td>
+            <td>  <a href="/lawtitle/{{ law.id }}" target="_blank">{{ law.name }}</a>  </td>
+            <td>{{ law.organization }}</td>
+            <td>{{ law.short_name }}</td>
+            <td>{{ law.publish_date|date:"Y年m月d日" }}</td>
+            <td>{{ law.modify_date|date:"Y年m月d日"  }}</td>
+            <td>{{ law.start_date |date:"Y年m月d日" }}</td>
+            <td>{{ law.end_date|date:"Y年m月d日"  }}</td>
+            <td>{{ law.type }}</td>
+        </tr>
+    {% endfor %}
+</table>
+</div>
+</body>
+</html>
