@@ -108,9 +108,15 @@ def edit_knowledge(request,kid):
 	knowledge_obj = models.Knowledge.objects.filter(id=kid).first()
 	contents = knowledge_obj.content
 	if contents:
-		if "[" and "]" in contents:
+		if "[" and "]" and "'" in contents:
 			contents = []
 			for i in knowledge_obj.content.strip("[]").split("'"):
+				i = i.strip(" ")
+				if i and i != ","and i != "，":
+					contents.append(i)
+		elif "[" and "]" and '"' in contents:
+			contents = []
+			for i in knowledge_obj.content.strip("[]").split('"'):
 				i = i.strip(" ")
 				if i and i != ","and i != "，":
 					contents.append(i)
@@ -137,12 +143,7 @@ def edit_knowledge(request,kid):
 				return redirect("/knowledge/"+str(knowledge_obj.parent_id))
 		else:
 			return redirect("/knowledge/"+str(knowledge_obj.id))
-	return render(request,"doctree/knowledge_edit.html",{"obj":knowledge_obj,"contents":contents})	
-	
-	
-	
-
-	
+	return render(request,"doctree/knowledge_edit.html",{"obj":knowledge_obj,"contents":contents})
 	
 
 
