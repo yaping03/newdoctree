@@ -128,14 +128,19 @@ def edit_knowledge(request,kid):
 		content = request.POST.getlist("content")
 		if content:
 			if len(content)==1 and content[0]!='"'and content[0]!="'":
-				content=str(content).strip("[]").strip('"').strip("'")
+				contentend=content[0].strip('"').strip("'")
 			elif len(content)>1:
-				pass
+				contentend=[]
+				for i in content:
+					if i.strip("'").strip('"').strip(" "):
+						contentend.append(i)
+				if not contentend:
+					contentend=None
 			else:
-				content=None
+				contentend=None
 		else:
-			content=None
-		models.Knowledge.objects.filter(id=kid).update(title=title, category=category,content=content)
+			contentend=None
+		models.Knowledge.objects.filter(id=kid).update(title=title, category=category,content=contentend)
 		if knowledge_obj.parent_id:
 			if knowledge_obj.parent.parent_id:
 				return redirect("/knowledge/"+str(knowledge_obj.parent.parent_id))
