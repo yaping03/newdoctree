@@ -343,14 +343,13 @@ def near_range(pagination):
 
 def lawlist(request):
     if request.method == "GET":
+        page_num = request.GET.get("page")
         law_query = models.Law.objects.all()
-        page_num = int(request.GET.get("page"))
         if not page_num:
             page_num=1
+        page_num = int(page_num)
         paginator = Paginator(law_query, 10)
-
         if paginator.num_pages > 10:
-
             if page_num - 5 < 1:
                 pageRange = range(1, 11)
             elif page_num + 5 > paginator.num_pages:
