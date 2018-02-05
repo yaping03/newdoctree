@@ -81,6 +81,76 @@ def knowledge(request, kid):
 	
 	return render(request, 'doctree/knowledge.html', context)
 
+	
+def add_knowledge(request,kid):
+	if request.method=="POST":
+		knowledge_obj = models.Knowledge.objects.filter(id=kid).first()
+		level = knowledge_obj.level
+		chapter_id = knowledge_obj.chapter_id
+		title = request.POST.get("title")
+		category = request.POST.get("category")
+		status = request.POST.get("status")
+		content = request.POST.getlist("content")
+		if content[0].strip("'").strip(" "):
+			if len(content)==1:
+				content=content[0].strip("'").strip(" ")
+		else:
+			content = None
+		models.Knowledge.objects.create(title=title, category=category, level=level + 1, content=content, status=status,
+										meta=None, chapter_id=chapter_id, parent=knowledge_obj)
+		if knowledge_obj.parent_id:
+			return redirect("/knowledge/"+str(knowledge_obj.parent_id))
+		else:
+			return redirect("/knowledge/"+str(knowledge_obj.id))
+	return render(request,"doctree/knowledge_add.html")
+
+def edit_knowledge(request,kid):
+	knowledge_obj = models.Knowledge.objects.filter(id=kid).first()
+	contents = knowledge_obj.content
+	if contents:
+		if "[" and "]" and "'" in contents:
+			contents = []
+			for i in knowledge_obj.content.strip("[]").split("'"):
+				i = i.strip(" ")
+				if i and i != ","and i != "，":
+					contents.append(i)
+		elif "[" and "]" and '"' in contents:
+			contents = []
+			for i in knowledge_obj.content.strip("[]").split('"'):
+				i = i.strip(" ")
+				if i and i != ","and i != "，":
+					contents.append(i)
+		else:
+			contents = [contents]
+	if request.method == "POST":
+		title = request.POST.get("title")
+		category = request.POST.get("category")
+		content = request.POST.getlist("content")
+		if content:
+			if len(content)==1 and content[0]!='"'and content[0]!="'":
+				contentend=content[0].strip('"').strip("'")
+			elif len(content)>1:
+				contentend=[]
+				for i in content:
+					if i.strip("'").strip('"').strip(" "):
+						contentend.append(i)
+				if not contentend:
+					contentend=None
+			else:
+				contentend=None
+		else:
+			contentend=None
+		models.Knowledge.objects.filter(id=kid).update(title=title, category=category,content=contentend)
+		if knowledge_obj.parent_id:
+			if knowledge_obj.parent.parent_id:
+				return redirect("/knowledge/"+str(knowledge_obj.parent.parent_id))
+			else:
+				return redirect("/knowledge/"+str(knowledge_obj.parent_id))
+		else:
+			return redirect("/knowledge/"+str(knowledge_obj.id))
+	return render(request,"doctree/knowledge_edit.html",{"obj":knowledge_obj,"contents":contents})
+	
+
 
 def kwmerge(request):
 	action = request.POST.get('action')
@@ -343,11 +413,27 @@ def near_range(pagination):
 
 def lawlist(request):
     if request.method == "GET":
+        page_num = request.GET.get("page")
         law_query = models.Law.objects.all()
+        if not page_num:
+            page_num=1
+        page_num = int(page_num)
+        paginator = Paginator(law_query, 10)
+        if paginator.num_pages > 10:
+            if page_num - 5 < 1:
+                pageRange = range(1, 11)
+            elif page_num + 5 > paginator.num_pages:
+                pageRange = range(page_num - 5, paginator.num_pages + 1)
+            else:
+                pageRange = range(page_num - 5, page_num + 5)
+        else:
+            pageRange = paginator.page_range
+
+        law_query = paginator.page(page_num)
     else:
         return HttpResponse("ERROR!")
 
-    return render(request,"doctree/lawlist.html",{"law_query":law_query})
+    return render(request,"doctree/lawlist.html",{"law_query":law_query,"num_pages":pageRange,"paginator":paginator,"page_num":page_num})
 
 def law_title(request,law_id):
     if request.method == "GET":

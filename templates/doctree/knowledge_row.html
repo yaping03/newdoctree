@@ -15,15 +15,27 @@
 	{% endfor %}
 
 	<td colspan="{{ knowledge.span }}" class="doctree-level-{{knowledge.level}}">
-		<a target="_blank" href="/admin/doctree/knowledge/{{knowledge.id}}/change">
+    {% if knowledge.level != 6 %}
+        <a target="_blank" href="/admin/doctree/knowledge/{{knowledge.id}}/change">
 			{{ knowledge.title }}
 		</a>
 		<span class="label label-{{ knowledge.statusClass }}">{{ knowledge.status }}</span>
+        <a target="_blank" href="/knowledge/{{ knowledge.id }}/add">添加</a>
+        <a target="_blank" href="/knowledge/{{ knowledge.id }}/edit">编辑</a>
+        {% else %}
+        <a target="_blank" href="/admin/doctree/knowledge/{{knowledge.id}}/change">
+			{{ knowledge.title }}
+		</a>
+		<span class="label label-{{ knowledge.statusClass }}">{{ knowledge.status }}</span>
+        <a target="_blank" href="/knowledge/{{ knowledge.id }}/edit">编辑</a>
+    {% endif %}
+
+{#        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal"> &nbsp; 添加 &nbsp; </button>#}
+{#        <button type="button" class="btn btn-info btn-sm"> &nbsp; 编辑 &nbsp; </button>#}
 		{% if knowledge.content %}
 		<button type="button" class="btn btn-default btn-sm" data-toggle="collapse"  data-target="#kw-{{ knowledge.id }}">
 			内容
 		</button>
-
 		<div id="kw-{{ knowledge.id }}" class="collapse">
 			{{ knowledge.content }}
 		</div>
@@ -36,3 +48,4 @@
 		</ul>
 	</td>
 </tr>
+
