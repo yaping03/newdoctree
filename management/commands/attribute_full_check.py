@@ -147,6 +147,9 @@ class Command(BaseCommand):
 		with open(dir, encoding="utf-8-sig") as file:
 			for word in file:
 				results.append(word.strip())
+
+		knowledges = Knowledge.objects.filter(level=4).values_list('title', flat=True)
+		results = list(set(knowledges))
 		return results
 
 	def get_row(self, word, values_dict, series):
