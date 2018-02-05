@@ -51,8 +51,8 @@ class Command(BaseCommand):
 					book = self.loadBook(data, uploading)
 					level1 = self.loadIndex(data, 1, book, None)
 
-					print("deleted")
-					print(self.deleted)
+		print("deleted")
+		print(self.deleted)
 
 	def isJson(self, file):
 		segs = file.split('.')
