@@ -4,8 +4,6 @@ import os, json
 
 class Command(BaseCommand):
 
-	deleted = []
-
 	def add_arguments(self, parser):
 		parser.add_argument('dir', nargs='+', type=str)
 		# print(parser)
@@ -50,9 +48,6 @@ class Command(BaseCommand):
 					data = self.loadJSON(filePath)
 					book = self.loadBook(data, uploading)
 					level1 = self.loadIndex(data, 1, book, None)
-
-		print("deleted")
-		print(self.deleted)
 
 	def isJson(self, file):
 		segs = file.split('.')
@@ -127,16 +122,20 @@ class Command(BaseCommand):
 
 
 	def loadKnowledge(self, levelItem, level, chapter, parent):
-		will_handle = True
+
+		knowledge = None
 		if level==4:
-			title = levelItem.get('title')
-			if title:
-				kws = Knowledge.objects.filter(level=4, title=title).count()
-				if kws:
-					self.deleted.append(title)
-					will_handle = False
-				
-		if will_handle:
+			existed = Knowledge.objects.filter(level=4, title=levelItem.get('title'), status='pass').order_by('id')
+			if existed:
+				knowledge = existed[0]
+				self.stdout.write("update: "+str(knowledge))
+		elif level==5:
+			existed = Knowledge.objects.filter(level=5, title=levelItem.get('title'), parent_id=parent.id).order_by('id')
+			if existed:
+				for k in existed:
+					k.deleteAll()
+
+		if not knowledge:
 			knowledge = Knowledge()
 			knowledge.title = levelItem.get('title')
 			knowledge.category = levelItem.get('type')
@@ -144,20 +143,21 @@ class Command(BaseCommand):
 			knowledge.chapter = chapter
 			knowledge.parent = parent
 
-			content = levelItem.get('content')
+		content = levelItem.get('content')
+		if content:
+			knowledge.content = content
+		else:
+			content = levelItem.get('list')
 			if content:
-				knowledge.content = content
-			else:
-				content = levelItem.get('list')
-				if content:
-					knowledge.content = json.dumps(content, ensure_ascii=False)
+				knowledge.content = json.dumps(content, ensure_ascii=False)
 
-			knowledge.save()
+		knowledge.status = 'pass'
+		knowledge.save()
 
-			nextKnowledges = self.getKnowledges(levelItem, level+1)
-			if nextKnowledges:
-				for k in nextKnowledges:
-					self.loadKnowledge(k, level+1, chapter, knowledge)
+		nextKnowledges = self.getKnowledges(levelItem, level+1)
+		if nextKnowledges:
+			for k in nextKnowledges:
+				self.loadKnowledge(k, level+1, chapter, knowledge)
 
 
 	def getChapters(self, levelDict, level):
