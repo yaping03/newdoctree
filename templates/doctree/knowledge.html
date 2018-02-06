@@ -52,14 +52,38 @@
 					<p class="text-danger">选中项及其子元素均未通过检验，需重做</p>
 				</div>
 			</div>
+                <div class="clo-md-3">
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        导出为 <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a href="#" class="export">excel</a></li>
+                        <li><a href="#" class="export">word</a></li>
+                        <li><a href="#" class="export">markdown</a></li>
+                      </ul>
+                    </div>
+                </div>
 		</form>
 	</div>
 </div>
-
-
+    <script>
+    $(".export").click(function () {
+        var checkid = [];
+        var type = $(this).html();
+        $("td input:checked").each(function () {
+            checkid.push($(this).parent().next().next().html());
+        });
+        $.ajax({
+                url:"/export_file",
+               type:"POST",
+               data:{type:type,checklist:JSON.stringify(checkid),"csrfmiddlewaretoken":$("[name='csrfmiddlewaretoken']").val()},
+               success:function(data) {
+                   if (data=="OK"){
+                    alert("完成")
+                   }
+               }})
+    });
+    </script>
+    
 {% endblock content %}
-
-
-
-
-
