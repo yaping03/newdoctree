@@ -5,7 +5,7 @@
 		<form method="POST" action="{% url 'kwmerge' %}">
 			{% csrf_token %}
 			<input type="hidden" name="prev_url" value="{{ request.path }}"/>
-			
+
 			<table class="table table-bordered table-striped">
 				<thead>
 					<tr>
@@ -85,5 +85,15 @@
                }})
     });
     </script>
+<<<<<<< HEAD
     
 {% endblock content %}
+=======
+
+{% endblock content %}
+
+
+
+
+
+>>>>>>> 6b4ddf801bb96925481f071fc65d59220e6ccfb6

@@ -5,15 +5,17 @@ import os, json,docx,xlwt
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument('dir', nargs='+', type=str)
-
+        parser.add_argument('--file', dest='file',nargs='+', type=str)
+        parser.add_argument('--h5', dest='h5',nargs='+', type=str)
+        parser.add_argument('--fmt',dest='fmt', nargs='+', type=str)
+        print(parser)
     def handle(self,*args, **options):
-        file = options['dir'][0]
-        if len(options['dir'])>2:
-            filters = options['dir'][1:-1]
-        else:
-            filters=[]
-        types=options['dir'][-1]
+        file = options['file'][0]
+        # if len(options['--h5'])>1:
+        #     filters = options['--h5'][1:-1]
+        # else:
+        filters=options['h5']
+        types=options['fmt'][0]
         def select_relative(line):
             h4, h5, h6 = {}, {}, {}
             title = line.strip("\n").strip()
@@ -146,13 +148,14 @@ class Command(BaseCommand):
                                     f.writelines(v.get("content") + "\n")
         with open(file,"r",encoding="utf-8")as f:
             for line in f:
-                h4,h5,h6=select_relative(line)
-                if types == "excel":
-                    excel_write(h4, h5, h6)
-                elif types == "word":
-                    word_write(h4, h5, h6)
-                elif types == "markdown":
-                    md_write(h4, h5, h6)
-                else:
-                    print("输出参数格式有误")
+                if line.strip().strip("\n"):
+                    h4,h5,h6=select_relative(line)
+                    if types == "excel":
+                        excel_write(h4, h5, h6)
+                    elif types == "word":
+                        word_write(h4, h5, h6)
+                    elif types == "markdown":
+                        md_write(h4, h5, h6)
+                    else:
+                        print("输出参数格式有误")
 

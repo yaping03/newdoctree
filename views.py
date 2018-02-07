@@ -6,7 +6,10 @@ from doctree import models
 from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import json,xlwt,docx
+<<<<<<< HEAD
 
+=======
+>>>>>>> 6b4ddf801bb96925481f071fc65d59220e6ccfb6
 
 
 # Create your views here.
@@ -473,7 +476,10 @@ def provision_view(request,law_id,types,parent_id=None):
         return HttpResponse("ERROR!")
     return render(request,"doctree/provision.html",{"law":law,"provisions":provisions,"now":now})
 	
+<<<<<<< HEAD
 	
+=======
+>>>>>>> 6b4ddf801bb96925481f071fc65d59220e6ccfb6
 def export_file(request):
 	if request.method=="POST":
 		types = request.POST.get("type")
@@ -629,5 +635,9 @@ def export_file(request):
 		else:
 			print("输出参数格式有误")
 
+<<<<<<< HEAD
 	return HttpResponse("OK")
 
+=======
+	return HttpResponse("OK")
+>>>>>>> 6b4ddf801bb96925481f071fc65d59220e6ccfb6
