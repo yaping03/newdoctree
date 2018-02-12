@@ -301,3 +301,26 @@ class Provision(models.Model):
 	def __str__(self):
 		return self.serial_number
 
+class Celebrity(models.Model):
+	name = models.CharField(max_length=24)
+	cname = models.CharField(max_length=12,null=True,blank=True)
+	cfname = models.CharField(max_length=24,null=True,blank=True)
+	ename = models.CharField(max_length=24,null=True,blank=True)
+	efname = models.CharField(max_length=48,null=True,blank=True)
+	othername = models.CharField(max_length=24,null=True,blank=True)
+	avatar = models.ImageField(verbose_name='头像',upload_to='avatar',default='defult.jpg')
+	describe = models.CharField(verbose_name="签名",max_length=128,null=True,blank=True)
+	introduction = models.TextField(null=True,blank=True)
+	created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
+	modified_at = models.DateTimeField(auto_now=True, auto_now_add=False)
+	def __str__(self):
+		return self.name
+
+class Quote(models.Model):
+	famous = models.ForeignKey("Celebrity",on_delete=models.CASCADE)
+	content = models.TextField()
+	tag = models.CharField(max_length=24,null=True,blank=True)
+	created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
+	modified_at = models.DateTimeField(auto_now=True, auto_now_add=False)
+	def __str__(self):
+		return self.content

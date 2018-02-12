@@ -74,21 +74,17 @@
         $("td input:checked").each(function () {
             checkid.push($(this).parent().next().next().html());
         });
-        $.ajax({
+        if(checkid.length>0){
+                    $.ajax({
                 url:"/export_file",
                type:"POST",
                data:{type:type,checklist:JSON.stringify(checkid),"csrfmiddlewaretoken":$("[name='csrfmiddlewaretoken']").val()},
                success:function(data) {
-                   if (data=="OK"){
-                    alert("完成")
-                   }
+                   window.location="/"+data
                }})
+        }
     });
     </script>
-<<<<<<< HEAD
-    
-{% endblock content %}
-=======
 
 {% endblock content %}
 
@@ -96,4 +92,3 @@
 
 
 
->>>>>>> 6b4ddf801bb96925481f071fc65d59220e6ccfb6

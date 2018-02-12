@@ -37,7 +37,8 @@
 					<input class="form-control" type="text" name="search" value="{{ search|none_2_null }}" placeholder="搜索" />
 				</div>
 				<div class="col-md-3">
-					<input class="btn btn-default" type="submit" value="筛选"/>
+					<input class="btn btn-default" type="submit" value="筛选"/> &nbsp;
+                    <button type="button" id="add_h4" class="btn btn-primary">添加</button>
 				</div>
 			</div>
 		</form>
@@ -113,6 +114,11 @@
 	</div>
 </div>
 
+    <script>
+    $("#add_h4").click(function () {
+        window.location="/h4add"
+    })
+    </script>
 {% endblock content %}
 
 

@@ -11,10 +11,14 @@ class Command(BaseCommand):
         print(parser)
     def handle(self,*args, **options):
         file = options['file'][0]
-        # if len(options['--h5'])>1:
-        #     filters = options['--h5'][1:-1]
-        # else:
-        filters=options['h5']
+        filterlist=options['h5']
+        filters = []
+        for i in filterlist:
+            if i.strip() and i.strip()!=",":
+                for item in i.split(","):
+                    if item.strip():
+                        filters.append(item)
+        print(filters)
         types=options['fmt'][0]
         def select_relative(line):
             h4, h5, h6 = {}, {}, {}

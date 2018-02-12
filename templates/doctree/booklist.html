@@ -29,7 +29,9 @@
 							<td>
 								{{ book.id }}
 							</td>
-							<td>{{ book.summarized }}</td>
+                            <td>{{ book.summarized }} &nbsp; <span class="label label-success"><a href="/bookchapter/{{ book.id }}">查看章节</a></span>
+                                 &nbsp; <span class="label label-info"><a href="/kwlist?page=1&book_id={{ book.id }}&status=&search=">查看H4</a></span>
+                            </td>
 							<td>
 								{{ book.statusCount.pending }}
 							</td>

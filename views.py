@@ -5,11 +5,9 @@ from doctree.models import Knowledge, Chapter, Book, LinkMissing
 from doctree import models
 from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-import json,xlwt,docx
-<<<<<<< HEAD
-
-=======
->>>>>>> 6b4ddf801bb96925481f071fc65d59220e6ccfb6
+from django import forms
+from doctree.forms import FamousForm
+import json,xlwt,docx,os,time
 
 
 # Create your views here.
@@ -85,7 +83,6 @@ def knowledge(request, kid):
 	
 	return render(request, 'doctree/knowledge.html', context)
 
-	
 def add_knowledge(request,kid):
 	if request.method=="POST":
 		knowledge_obj = models.Knowledge.objects.filter(id=kid).first()
@@ -476,13 +473,10 @@ def provision_view(request,law_id,types,parent_id=None):
         return HttpResponse("ERROR!")
     return render(request,"doctree/provision.html",{"law":law,"provisions":provisions,"now":now})
 	
-<<<<<<< HEAD
-	
-=======
->>>>>>> 6b4ddf801bb96925481f071fc65d59220e6ccfb6
 def export_file(request):
-	if request.method=="POST":
+	if request.method == "POST":
 		types = request.POST.get("type")
+
 		def select_relative():
 			checklist = request.POST.get("checklist")
 			checklist = json.loads(checklist)
@@ -496,7 +490,8 @@ def export_file(request):
 				if obj.parent:
 					if obj.parent.parent:
 						if obj.parent.parent.title not in h4:
-							h4[obj.parent.parent.title] = {"content": obj.parent.parent.content, "id": obj.parent.parent.id}
+							h4[obj.parent.parent.title] = {"content": obj.parent.parent.content,
+														   "id": obj.parent.parent.id}
 						if obj.parent.title not in h5:
 							h5[obj.parent.title] = {"content": obj.parent.content, "id": obj.parent.id,
 													"parent_id": obj.parent.parent.id}
@@ -506,51 +501,54 @@ def export_file(request):
 						if obj.parent.title not in h4:
 							h4[obj.parent.title] = {"content": obj.parent.content, "id": obj.parent.id}
 						if obj.title not in h5:
-							h5[obj.title]={"content":obj.content,"id":obj.id,"parent_id":obj.parent.id}
+							h5[obj.title] = {"content": obj.content, "id": obj.id, "parent_id": obj.parent.id}
 						children = models.Knowledge.objects.filter(parent=obj)
 						for child in children:
 							if child.title not in h6:
-								h6[child.title]={"content":child.content,"id":child.id,"parent_id":child.parent.id}
+								h6[child.title] = {"content": child.content, "id": child.id,
+												   "parent_id": child.parent.id}
 				else:
 					if obj.title not in h4:
 						h4[obj.title] = {"content": obj.content, "id": obj.id}
 					children = models.Knowledge.objects.filter(parent=obj)
 					for child in children:
 						if child.title not in h5:
-							h5[child.title]={"content":child.content,"id":child.id,"parent_id":child.parent.id}
+							h5[child.title] = {"content": child.content, "id": child.id,
+											   "parent_id": child.parent.id}
 						son = models.Knowledge.objects.filter(parent=child)
 						for s in son:
 							if s.title not in h6:
 								h6[s.title] = {"content": s.content, "id": s.id, "parent_id": s.parent.id}
-			return h4,h5,h6
-		def excel_write(h4,h5,h6):
+			return h4, h5, h6
+
+		def excel_write(h4, h5, h6):
 			wbk = xlwt.Workbook()
 			sheet = wbk.add_sheet('show_knowledge')
 			sheet.write(0, 0, '标题')
 			sheet.write(0, 1, 'H4内容、H5标题')
 			sheet.write(0, 2, 'H5内容、H6标题')
 			sheet.write(0, 3, 'H6内容')
-			for k,v in h4.items():
+			for k, v in h4.items():
 				file_name = k
-				sheet.write(1,0,k)
-				sheet.write(1,1,v.get("content"))
-			line=1
+				sheet.write(1, 0, k)
+				sheet.write(1, 1, v.get("content"))
+			line = 1
 			column = 1
-			for title,swap in h5.items():
-				line+=1
-				sheet.write(line,column,title)
+			for title, swap in h5.items():
+				line += 1
+				sheet.write(line, column, title)
 				if swap.get("content"):
 					if "[" and "]" in swap.get("content"):
 						contents = eval(swap.get("content"))
 						for content in contents:
-							sheet.write(line,column+1,content)
-							line+=1
+							sheet.write(line, column + 1, content)
+							line += 1
 					else:
-						sheet.write(line,column+1,swap.get("content"))
-				for k,v in h6.items():
-					if v.get("parent_id")==swap.get("id"):
-						line+=1
-						sheet.write(line, column+1, k)
+						sheet.write(line, column + 1, swap.get("content"))
+				for k, v in h6.items():
+					if v.get("parent_id") == swap.get("id"):
+						line += 1
+						sheet.write(line, column + 1, k)
 						if v.get("content"):
 							if "[" and "]" in v.get("content"):
 								contents = eval(v.get("content"))
@@ -559,10 +557,13 @@ def export_file(request):
 									line += 1
 							else:
 								sheet.write(line, column + 2, v.get("content"))
-			wbk.save(r'doctree/management/xls/' + file_name + ".xls")
-		def word_write(h4,h5,h6):
+			wbk.save("static/xls/" + file_name + ".xls")
+			return "static/xls/" + file_name + ".xls"
+
+		# wbk.save(r'doctree/management/xls/' + file_name + ".xls")
+		def word_write(h4, h5, h6):
 			doc = docx.Document()
-			for k,v in h4.items():
+			for k, v in h4.items():
 				file_name = k
 				p = doc.add_paragraph(style="Heading 1")
 				w = p.add_run(k)
@@ -595,49 +596,161 @@ def export_file(request):
 							else:
 								p = doc.add_paragraph()
 								w = p.add_run(v.get("content"))
+			doc.save("static/docx/" + file_name + ".docx")
+			return "static/docx/" + file_name + ".docx"
 
-			doc.save(r'doctree/management/word/' + file_name + ".docx")
-		def md_write(h4,h5,h6):
-			for k,v in h4.items():
+		# doc.save(r'doctree/management/word/' + file_name + ".docx")
+		def md_write(h4, h5, h6):
+			for k, v in h4.items():
 				file_name = k
 				content = v.get("content")
-			with open(r'doctree/management/markdown/' + file_name + ".md", "w", encoding="utf-8") as f:
-				f.writelines("#### "+file_name+"\n")
+			with open(r'static/markdown/' + file_name + ".md", "w", encoding="utf-8") as f:
+				f.writelines("#### " + file_name + "\n")
 				if content:
-					f.writelines(content+"\n")
+					f.writelines(content + "\n")
 				for title, swap in h5.items():
-					f.writelines("##### "+title+"\n")
+					f.writelines("##### " + title + "\n")
 					if swap.get("content"):
 						if "[" and "]" in swap.get("content"):
 							contents = eval(swap.get("content"))
 							for content in contents:
-								f.writelines("- "+content+"\n")
+								f.writelines("- " + content + "\n")
 						else:
-							f.writelines(swap.get("content")+"\n")
+							f.writelines(swap.get("content") + "\n")
 					for k, v in h6.items():
 						if v.get("parent_id") == swap.get("id"):
-							f.writelines("###### "+k+"\n")
+							f.writelines("###### " + k + "\n")
 							if v.get("content"):
 								if "[" and "]" in v.get("content"):
 									contents = eval(v.get("content"))
 									for content in contents:
-										f.writelines("- "+content+"\n")
+										f.writelines("- " + content + "\n")
 								else:
-									f.writelines(v.get("content")+"\n")
+									f.writelines(v.get("content") + "\n")
+			return "static/markdown/" + file_name + ".md"
 
-		h4,h5,h6=select_relative()
-		if types=="excel":
-			excel_write(h4,h5,h6)
-		elif types=="word":
-			word_write(h4,h5,h6)
-		elif types=="markdown":
-			md_write(h4,h5,h6)
+		h4, h5, h6 = select_relative()
+		if types == "excel":
+			file_path = excel_write(h4, h5, h6)
+		elif types == "word":
+			file_path = word_write(h4, h5, h6)
+		elif types == "markdown":
+			file_path = md_write(h4, h5, h6)
 		else:
 			print("输出参数格式有误")
 
-<<<<<<< HEAD
-	return HttpResponse("OK")
+	return HttpResponse(file_path)
 
-=======
-	return HttpResponse("OK")
->>>>>>> 6b4ddf801bb96925481f071fc65d59220e6ccfb6
+
+def book_chapter(request,bid):
+	book = models.Book.objects.filter(id=bid).first()
+	chapters=[]
+	sections = []
+	titles = []
+	chapter=models.Chapter.objects.filter(book=book,parent=None)
+	for c in chapter:
+		chapters.append({"title":c.title,"id":c.id})
+		section = models.Chapter.objects.filter(parent=c)
+		for s in section:
+			sections.append({"title":s.title,"pid":c.id,"id":s.id})
+			title = models.Chapter.objects.filter(parent=s)
+			for t in title:
+				titles.append({"title":t.title,"pid":s.id})
+
+	return render(request,"doctree/chapter.html",{"book":book,"chapters":chapters,"sections":sections,"titles":titles})
+
+def quotelist(request):
+	quotelists = []
+	famous = models.Celebrity.objects.all()
+	page_num = request.GET.get("page")
+	if not page_num:
+		page_num = 1
+	page_num = int(page_num)
+	for obj in famous:
+		i = 0
+		tmp  = []
+		quotes = models.Quote.objects.filter(famous=obj)
+		for quote in quotes:
+			if i == 0:
+				quotelists.append([obj,len(quotes),quote,tmp])
+			else:
+				tmp.append(quote)
+			i+=1
+	paginator = Paginator(quotelists,3)
+	if paginator.num_pages > 10:
+		if page_num - 5 < 1:
+			pageRange = range(1, 11)
+		elif page_num + 5 > paginator.num_pages:
+			pageRange = range(page_num - 5, paginator.num_pages + 1)
+		else:
+			pageRange = range(page_num - 5, page_num + 5)
+	else:
+		pageRange = paginator.page_range
+	query = paginator.page(page_num)
+	return render(request,"doctree/quotelist.html",{"quotelist":quotelists,"query":query,"num_pages":pageRange,"paginator":paginator,"page_num":page_num})
+
+def add_famous(request):
+	errors = {}
+	if request.method=="POST":
+		form = FamousForm(request.POST,request.FILES)
+		avatar_img = request.FILES.get("avatar_img")
+		if form.is_valid():
+			name = form.cleaned_data["name"]
+			cname = form.cleaned_data["cname"]
+			cfname = form.cleaned_data["cfname"]
+			ename = form.cleaned_data["ename"]
+			efname = form.cleaned_data["efname"]
+			othername = form.cleaned_data["othername"]
+			describe = form.cleaned_data["describe"]
+			introduction = form.cleaned_data["introduction"]
+			content = form.cleaned_data["content"]
+			tag = form.cleaned_data["tag"]
+			Celebrity_obj = models.Celebrity.objects.create(name=name, cname=cname, cfname=cfname, ename=ename,
+															efname=efname, othername=othername,
+															describe=describe, introduction=introduction)
+			if avatar_img:
+				with open("static/upload/avatar/" + str(Celebrity_obj.id) + ".jpg", "wb")as f:
+					f.write(avatar_img.read())
+				models.Celebrity.objects.filter(id=Celebrity_obj.id).update(avatar=str(Celebrity_obj.id) + ".jpg")
+			models.Quote.objects.create(famous=Celebrity_obj, content=content, tag=tag)
+			return HttpResponse("OK")
+		else:
+			errors["name"]=form.errors["name"][0]
+			errors["content"]=form.errors["content"][0]
+			print(errors)
+		return HttpResponse(json.dumps(errors))
+	else:
+		forms = FamousForm()
+	return render(request,"doctree/add_famous.html",{"form":forms})
+
+def add_quote(request,cid):
+	famous_obj = models.Celebrity.objects.filter(id=cid).first()
+	if request.method=="POST":
+		models.Quote.objects.create(famous=famous_obj,content=request.POST.get("title"),tag=request.POST.get("tag"))
+		return redirect("/quotelist")
+	return render(request,"doctree/add_quote.html",{"name":famous_obj.name})
+
+def edit_quote(request,qid):
+	quote = models.Quote.objects.filter(id=qid).first()
+	if request.method=="POST":
+		models.Quote.objects.filter(id=qid).update(content=request.POST.get("title"),tag=request.POST.get("tag"))
+		return redirect("/quotelist")
+	return render(request,"doctree/edit_quote.html",{"name":quote.famous.name,"quote":quote})
+
+def edit_famous(request,cid):
+	famous = models.Celebrity.objects.filter(id=cid)
+	if request.method=="POST":
+		avatar_img = request.FILES.get("avatar_img")
+		data = request.POST
+		if avatar_img:
+			with open("static/upload/avatar/"+str(cid)+".jpg","wb")as f:
+				f.write(avatar_img.read())
+			famous.update(name=data.get("name"),cname=data.get("cname"),cfname=data.get("cfname"),
+						  ename=data.get("ename"),efname=data.get("efname"),othername=data.get("othername"),
+						  avatar=str(cid)+".jpg",describe=data.get("describe"),introduction=data.get("introduction"))
+		else:
+			famous.update(name=data.get("name"), cname=data.get("cname"), cfname=data.get("cfname"),
+						  ename=data.get("ename"), efname=data.get("efname"), othername=data.get("othername"),
+						describe=data.get("describe"), introduction=data.get("introduction"))
+		return HttpResponse("OK")
+	return render(request,"doctree/editfamous.html",{"famous":famous.first(),"avatar":famous.first().avatar})

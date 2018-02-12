@@ -1,0 +1,64 @@
+{% load bootstrap3 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="container">
+<div class="h2 Center aligned text">名人名言 &nbsp;&nbsp; <a href="/addfamous">添加</a></div>
+<table class="table table-bordered table-striped">
+    <tr>
+        <th>名人</th>
+        <th>名言</th>
+    </tr>
+    {% for quote in query %}
+        <tr>
+        <td rowspan="{{ quote.1 }}" style="vertical-align: middle"><a href="/editfamous/{{ quote.0.id }}">{{ quote.0.name }}</a> &nbsp;<span class="label label-success"><a target="_blank" href="/addquote/{{ quote.0.id }}">添加名言</a> </span></td>
+            <td><span>{{ quote.2.content }}</span> &nbsp;<span class="label label-info"><a target="_blank" href="/editquote/{{ quote.2.id }}">修改</a></span></td>
+        </tr>
+        {% for obj in quote.3 %}
+            <tr>
+            <td><span>{{ obj.content }}</span> &nbsp;<span class="label label-info"><a target="_blank" href="/editquote/{{ obj.id }}">修改</a></span></td>
+            </tr>
+        {% endfor %}
+    {% endfor %}
+
+</table>
+<nav aria-label="Page navigation">
+  <ul class="pagination pagination-lg">
+    <li>
+        {% if query.has_previous %}
+        <a href="/quotelist/?page={{ query.previous_page_number }}" aria-label="Previous">
+            {% else %}
+            <a href="/quotelist/?page={{ paginator.num_pages }}" aria-label="Previous">
+        {% endif %}
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+      {% for foo in num_pages %}
+            {% if foo == page_num %}
+                <li class="active"><a href="/quotelist/?page={{ foo }}">{{ foo }}</a></li>
+            {% else %}
+                <li><a href="/quotelist/?page={{ foo }}">{{ foo }}</a></li>
+            {% endif %}
+      {% endfor %}
+    <li>
+        {% if query.has_next %}
+        <a href="/quotelist/?page={{ query.next_page_number }}" aria-label="Next">
+            {% else %}
+            <a href="/quotelist/?page=1" aria-label="Next">
+        {% endif %}
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+</div>
+
+</body>
+</html>

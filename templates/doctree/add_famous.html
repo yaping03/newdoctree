@@ -1,0 +1,145 @@
+{% load bootstrap3 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>add</title>
+    <style>
+        .msg{
+            color: red;
+            margin-top: 8px
+        }
+    </style>
+</head>
+<body>
+
+<form class="form-horizontal" action="" style="margin-top: 200px;margin-left: 400px" method="post" novalidate enctype="multipart/form-data">
+    {% csrf_token %}
+  <div class="form-group">
+    <label for="id_name" class="col-md-2 control-label">名字</label>
+    <div class="col-md-4 msg">
+        {{ form.name }}
+    </div>
+      <div id="name_error" class="col-md-4" style="color: red"></div>
+  </div>
+    <div class="form-group">
+    <label for="id_cname" class="col-md-2 control-label">中文名</label>
+    <div class="col-md-4 msg">
+        {{ form.cname }}
+    </div>
+  </div>
+
+    <div class="form-group">
+    <label for="id_cfname" class="col-md-2 control-label">中文全名</label>
+    <div class="col-md-4 msg">
+        {{ form.cfname }}
+    </div>
+  </div>
+    <div class="form-group">
+    <label for="id_ename" class="col-md-2 control-label">英文名</label>
+    <div class="col-md-4 msg">
+        {{ form.ename }}
+    </div>
+  </div>
+    <div class="form-group">
+    <label for="id_efname" class="col-md-2 control-label">英文全名</label>
+    <div class="col-md-4 msg">
+        {{ form.efname }}
+    </div>
+  </div>
+    <div class="form-group">
+    <label for="id_othername" class="col-md-2 control-label">别名</label>
+    <div class="col-md-4 msg">
+        {{ form.othername }}
+    </div>
+  </div>
+    <div class="form-group">
+    <label for="id_describe" class="col-md-2 control-label">签名</label>
+    <div class="col-md-4 msg">
+        {{ form.describe }}
+    </div>
+  </div>
+    <div class="form-group">
+    <label for="id_introduction" class="col-md-2 control-label">个人简介</label>
+    <div class="col-md-4 msg">
+        {{ form.introduction }}
+    </div>
+  </div>
+    <div class="form-group">
+    <label for="id_content" class="col-md-2 control-label">名言</label>
+    <div class="col-md-4 msg">
+        {{ form.content }}
+    </div>
+      <div id="content_errors" class="col-md-4" style="color: red"></div>
+  </div>
+    <div class="form-group">
+    <label for="id_tag" class="col-md-2 control-label">标签</label>
+    <div class="col-md-4 msg">
+        {{ form.tag }}
+    </div>
+  </div>
+    <label for="avatarimg" class="col-md-2 control-label" style="margin-top: 20px">头像</label>
+    <div class="col-md-4">
+        <div style="position: relative;height: 100px;width: 100px">
+            <img id="avatarimg" src="/static/upload/avatar/defult.jpg" alt="" style="height:100px;width: 100px;">
+        <input id="avatar" type="file" style="height: 100px;width: 100px;opacity: 0;position: absolute;top: 0;left: 0">
+        </div>
+        </div>
+  <div class="form-group" style="margin-top: 150px">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="button" class="btn btn-warning col-md-2 cancel">取消</button>
+      <button type="button" class="btn btn-success col-md-2 col-md-offset-1 submit">提交</button>
+    </div>
+  </div>
+</form>
+
+<script>
+    $('#avatar').change(function () {
+        var obj=$(this)[0].files[0];
+        var read=  new FileReader();
+        read.onload=function (e) {
+            $('#avatarimg').attr('src',this.result);
+        };
+        read.readAsDataURL(obj);
+    });
+    $('.submit').click(function () {
+        var formdata=new FormData();
+        formdata.append("name",$("#id_name").val());
+        formdata.append("cname",$("#id_cname").val());
+        formdata.append("cfname",$("#id_cfname").val());
+        formdata.append("ename",$("#id_cfname").val());
+        formdata.append("efname",$("#id_efname").val());
+        formdata.append("othername",$("#id_othername").val());
+        formdata.append("describe",$("#id_describe").val());
+        formdata.append("introduction",$("#id_introduction").val());
+        formdata.append("content",$("#id_content").val());
+        formdata.append("tag",$("#id_tag").val());
+        formdata.append("avatar_img",$("#avatar")[0].files[0]);
+        formdata.append("csrfmiddlewaretoken",$("[name='csrfmiddlewaretoken']").val());
+        $.ajax({
+            url:"/addfamous",
+            type:'POST',
+            data:formdata,
+            contentType:false,
+            processData:false,
+            success:function (data) {
+                if (data==="OK"){
+                     window.location="/quotelist/"
+                }
+                else {
+                    var data = JSON.parse(data);
+                    $("#name_error").text(data["name"]);
+                    $("#content_errors").text(data["content"]);
+                }
+            }
+        })
+    });
+    $(".cancel").click(function () {
+        window.close()
+    })
+</script>
+</body>
+</html>
